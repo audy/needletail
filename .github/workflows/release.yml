@@ -80,7 +80,7 @@ jobs:
         id: build_wheels
         run: |
           . venv/bin/activate
-          maturin build --features=python --release --strip --manylinux=on --sdist
+          maturin build --features=python --release --strip --manylinux=auto --sdist
 
       - name: List wheel artifacts
         run: |

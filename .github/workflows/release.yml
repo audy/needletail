@@ -91,6 +91,7 @@ jobs:
         with:
           name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
           path: target/wheels/*.whl
+          overwrite: true
 
   upload-release:
      needs: [build-wheels]

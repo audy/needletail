@@ -68,6 +68,7 @@ jobs:
         run: |
           docker run --rm \
             --volume $PWD:/io \
+            --workdir /io \
             quay.io/pypa/manylinux2014_x86_64 bash -c "
               PYVER=${{ matrix.python-version }} && PYVER=\${PYVER//./}
               PYBIN=\$(ls -d /opt/python/cp\${PYVER}-*/bin | tail -n 1)

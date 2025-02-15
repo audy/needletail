@@ -63,11 +63,10 @@ jobs:
           . venv/bin/activate
           pip install maturin
 
-      - name: Build wheels (Linux inside manylinux2014 container)
+      - name: Build wheels using maturin in manylinux2014
         if: runner.os == 'Linux'
         run: |
           docker run --rm -v $PWD:/io quay.io/pypa/manylinux2014_x86_64 bash -c "
-            yum install -y python${{ matrix.python-version }} && \
             /opt/python/cp${{ matrix.python-version }}-*/bin/pip install maturin && \
             /opt/python/cp${{ matrix.python-version }}-*/bin/maturin build --release --strip --manylinux 2014 --sdist"
 

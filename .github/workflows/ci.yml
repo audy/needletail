@@ -86,25 +86,23 @@ jobs:
           path: dist
 
   upload-release:
-     name: Upload release artifacts to GitHub
-     needs: [linux, macos, sdist]
-     runs-on: ubuntu-latest
-     steps:
-       - name: Download wheel artifacts
-         uses: actions/download-artifact@v3
-         with:
-           path: ./wheels
+    name: Upload release artifacts to GitHub
+    needs: [linux, macos, sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v4
 
-       - name: List downloaded wheels
-         run: ls -l wheels-*/*
+      - name: List downloaded wheels
+        run: ls -l wheels-*/*
 
-       - name: Upload Wheels to Release
-         uses: svenstaro/upload-release-action@v2
-         with:
-           repo_token: ${{ secrets.GITHUB_TOKEN }}
-           file: wheels-*/*
-           tag: ${{ github.event.release.tag_name }}
-           file_glob: true
+      - name: Upload Wheels to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: wheels-*/*
+          tag: ${{ github.event.release.tag_name }}
+          file_glob: true
 
   release:
     name: Release to PyPI

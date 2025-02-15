@@ -66,9 +66,13 @@ jobs:
       - name: Build wheels using maturin in manylinux2014
         if: runner.os == 'Linux'
         run: |
-          docker run --rm -v $PWD:/io quay.io/pypa/manylinux2014_x86_64 bash -c "
-            /opt/python/cp${{ matrix.python-version }}-*/bin/pip install maturin && \
-            /opt/python/cp${{ matrix.python-version }}-*/bin/maturin build --release --strip --manylinux 2014 --sdist"
+          docker run --rm \
+            --volume $PWD:/io \
+            quay.io/pypa/manylinux2014_x86_64 bash -c "
+              PYBIN=\$(ls -d /opt/python/cp${{ matrix.python-version }}-*/bin | tail -n 1)
+              \$PYBIN/pip install maturin
+              \$PYBIN/maturin build --release --strip --manylinux 2014 --sdist
+            "
 
       - name: Build wheels (macOS)
         if: runner.os != 'Linux'

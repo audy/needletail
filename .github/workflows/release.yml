@@ -1,5 +1,4 @@
 ---
-
 name: Build Wheels on Release
 on:
   release:
@@ -29,7 +28,7 @@ jobs:
             architecture: x64
             runner: macos-13 # x86
             python-version: "3.11"
-          # ubuntu - x86
+          # Ubuntu - x86 (Runs inside manylinux2014 container)
           - os: ubuntu-latest
             architecture: x64
             runner: ubuntu-latest
@@ -50,41 +49,36 @@ jobs:
           toolchain: stable
           override: true
 
-      # Setup Python for the selected version
       - name: Set up Python ${{ matrix.python-version }}
+        if: runner.os != 'Linux'
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
 
-      # Install Rust toolchain
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Install maturin
+      - name: Install maturin (macOS only)
+        if: runner.os != 'Linux'
         run: |
           python -m venv venv
           . venv/bin/activate
           pip install maturin
-          pip show maturin
 
-      - name: Add library to venv
+      - name: Build wheels (Linux inside manylinux2014 container)
+        if: runner.os == 'Linux'
+        run: |
+          docker run --rm -v $PWD:/io quay.io/pypa/manylinux2014_x86_64 bash -c "
+            yum install -y python${{ matrix.python-version }} && \
+            /opt/python/cp${{ matrix.python-version }}-*/bin/pip install maturin && \
+            /opt/python/cp${{ matrix.python-version }}-*/bin/maturin build --release --strip --manylinux 2014 --sdist"
+
+      - name: Build wheels (macOS)
+        if: runner.os != 'Linux'
         run: |
           . venv/bin/activate
-          maturin develop --features=python
-
-      - name: Build wheels
-        id: build_wheels
-        run: |
-          . venv/bin/activate
-          maturin build --features=python --release --strip --manylinux 2014 --sdist
+          maturin build --release --strip --sdist
 
       - name: List wheel artifacts
-        run: |
-          ls -lash target/wheels
+        run: ls -lash target/wheels
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4

@@ -17,9 +17,6 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-
 jobs:
   linux:
     runs-on: ${{ matrix.platform.runner }}
